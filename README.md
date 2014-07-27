@@ -6,6 +6,11 @@ Toolkit for Backbone apps
 ### Что такое
 Набор представлений "полуфабрикатов" для быстрого прототипирования приложений с использованием библиотеки Backbone. Каждое представление создана с целью решить определенный круг задач. 
 
+### Демо
+- [презентация-портфолио](http://matraska23.github.io/m3-backbone-toolkit/demo_presentation/index.html)
+- [флип счетчик](http://matraska23.github.io/m3-backbone-toolkit/demo_flip-clock/index.html)
+- [дата биндинг](http://matraska23.github.io/m3-backbone-toolkit/demo_binding/m3toolkit.html)
+
 
 ### m3toolkit.View
 Конструктор несложного представления, использующего шаблонизатор underscore. Имеет возможность работать со встроенными дочерними представлениями.
@@ -19,7 +24,7 @@ Toolkit for Backbone apps
 
 `var flipCollectionView = new FlipCollectionView({`
 
-`	collection: new FlipCounterCollection([...]),`
+`    collection: new FlipCounterCollection([...]),`
 
 `		el: $el`
 
