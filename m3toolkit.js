@@ -195,7 +195,7 @@ Copyright (C) Malcev N. 2013, 2014
 			}
 			
 			this._transformers[name].push(function(value){
-				cb.call(this, this.controls[viewPropertyName || name], value);
+				cb.call(this, this.controls[viewPropertyName || name], value, value.get(name));
 			}.bind(this));
 		},
 		
