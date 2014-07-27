@@ -321,6 +321,8 @@ var PresentationApp = View.extend({
 					'<h2 class="presentation_header1">Портфолио презентация</h2>' +
 					'<div class="presentation_liter1">Фронтенд разработчика Николая Мальцева</div>' +
 					'<div class="presentation_liter1">8 (960) 243 14 03, nsmalcev@bk.ru</div>' +
+					'<div class="presentation_liter1"><a href="http://matraska231.herokuapp.com/?portfolio=1#cv" target="_blank">Резюме</a></div>' +
+					
 				'</div>' +
 			'</div>' +
 		'</div>' +
