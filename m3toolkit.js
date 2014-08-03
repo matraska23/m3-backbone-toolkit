@@ -1,5 +1,5 @@
 ﻿/* 
-M3 toolkit - toolkit for Backbone apps
+M3 toolkit - toolkit for Backbone apps v2
 Copyright (C) Malcev N. 2013, 2014
 */
 (function(_env){
@@ -8,13 +8,13 @@ Copyright (C) Malcev N. 2013, 2014
 		// @param {Object} obj
 		// @return {Bool} - true if obj is a function
 		isFunction: function(obj){
-			return this.instance(obj)==='[object Function]'; 
+			return this.instance(obj) === '[object Function]'; 
 		},
 		// @memberOf $m - возвращает тип оБъекта
 		// @return {Object} obj
 		// @return {String}
 		instance: function(obj){return Object.prototype.toString.call(obj);},
-		isNumber: function(obj){return this.instance(obj)==='[object Number]';},
+		isNumber: function(obj){return this.instance(obj) === '[object Number]';},
 		isString: function(obj){return this.instance(obj) === '[object String]';},
 		isRegExp: function(obj){return this.instance(obj) === '[object RegExp]';},
 		isBoolean: function(obj){return this.instance(obj) === '[object Boolean]';},
@@ -28,7 +28,9 @@ Copyright (C) Malcev N. 2013, 2014
 			}
 
 			for(var i in o){
-				if(o.hasOwnProperty(i)) return false;
+				if(o.hasOwnProperty(i)){
+					return false;
+				}
 			}
 
 			return true;
@@ -51,8 +53,9 @@ Copyright (C) Malcev N. 2013, 2014
 	// View for representation of Backbone collection
 	toolkit.CollectionView = Backbone.View.extend({
 		tagName: 'div',
-		// @param {Object} - default collection config
-		// @param {Backbone.View} - view for items
+		// @param {Object} conf - default collection config
+		// 	conf.prependAdded: true - added items would be prepended in collection
+		// @param {Backbone.View} view - view for items
 		initialize: function (conf, view) {
 			this.children = {};
 			this.itemView = view;
@@ -63,7 +66,7 @@ Copyright (C) Malcev N. 2013, 2014
 			this.render();
 
 			this.listenTo(this.collection, 'add', function (model) {
-				this.$el.append(this._storeItem(model).el);
+				this.$el[!conf.prependAdded ? 'append' : 'prepend'](this._storeItem(model).el);
 			});
 			this.listenTo(this.collection, 'reset', function (newModels) {
 				this.cleanChildren();
@@ -80,11 +83,13 @@ Copyright (C) Malcev N. 2013, 2014
 		},
 		_storeItem: function(model){
 			var view = new this.itemView({model: model});
+			view.baseView = this;
 			this.children[model.cid] = view;
 			return view;
 		},
 		cleanChildren: function () {
 			_.each(this.children, function (child) {
+				child.baseView = null;
 				child.$el.off().remove();
 				child.remove();
 			});
@@ -106,13 +111,19 @@ Copyright (C) Malcev N. 2013, 2014
             this.render();
         },
         render: function () {
-            if (_.isString(this.template)) {
-                this.$el.empty().html(this.template);
-            } else {
-                var modelJSON = this.model ? this.model.toJSON({computed: true}) : {};
-                modelJSON._tools = this.tools;
-                this.$el.empty().html(this.template(modelJSON));
+            if(_.isString(this.template)){
+				
+				if(~this.template.indexOf('<%')){
+					this.template = _.template(this.template);
+				}else{
+					this.$el.empty().html(this.template);
+					return;
+				}
             }
+			
+			var modelJSON = this.model ? this.model.toJSON({computed: true}) : {};
+			modelJSON._tools = this.tools;
+			this.$el.empty().html(this.template(modelJSON));
         },
         remove: function() {
             this.trigger('remove');
