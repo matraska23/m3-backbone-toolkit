@@ -10,6 +10,7 @@ Toolkit for Backbone apps
 - [презентация-портфолио](http://matraska23.github.io/m3-backbone-toolkit/demo_presentation/index.html)
 - [флип счетчик](http://matraska23.github.io/m3-backbone-toolkit/demo_flip-clock/index.html)
 - [дата биндинг](http://matraska23.github.io/m3-backbone-toolkit/demo_binding/m3toolkit.html)
+- [пример работы со списком](http://matraska23.github.io/m3-backbone-toolkit/demo_list/app.html)
 
 
 ### m3toolkit.View
@@ -55,7 +56,7 @@ this._addComputed('computedFio', ['name', 'sername'], function(control, model){
 
 
 #### Преобразование значения
-Чтобы связать значения одноименных атрибутов модели и DOM-элементы реализована механика  метод _addTransform.
+Чтобы связать значения одноименных атрибутов модели и DOM-элементы доступна механика преобразования, которая может быть определена через метод _addTransform.
 ```
 this._addTransform('city', function(control, model){
 	var city = model.get('city');
