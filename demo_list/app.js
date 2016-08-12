@@ -76,7 +76,7 @@ var ProfileView = View.extend({
 			'</div>' +
 		'<% } %>' +
 		'<div class="app_prof-block_shortlist" data-bind="list"></div>' +
-		'<div class="app_prof-block_list-count" data-bind="count">еще <%=obj.hobbyList.length - 2 + " " +_tools.plural(obj.hobbyList.length - 2 , "интерес", "интереса", "интересов")%></div>' +
+		'<div class="app_prof-block_list-count" data-bind="count">еще <%=obj.hobbyList.length - 2 + " " + _tools.plural(obj.hobbyList.length - 2 , "интерес", "интереса", "интересов")%></div>' +
 	'</div>',
 	tools: { // would be available inside of underscore template as obj._tools or _tools
 		plural: function(age, one, little, many){

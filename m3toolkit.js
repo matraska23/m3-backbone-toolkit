@@ -56,7 +56,7 @@ Copyright (C) Malcev N. 2013, 2014
 		// @param {Object} conf - default collection config
 		// 	conf.prependAdded: true - added items would be prepended in collection
 		// @param {Backbone.View} view - view for items
-		initialize: function (conf, view) {
+		initialize: function(conf, view){
 			this.children = {};
 			this.itemView = view;
 
@@ -73,7 +73,7 @@ Copyright (C) Malcev N. 2013, 2014
 				this.render(newModels);
 			});
 		},
-		render: function (anotherCollection) {
+		render: function(anotherCollection){
 			var fragment = document.createDocumentFragment();
 
 			(anotherCollection || this.collection).each(function (model) {
@@ -87,7 +87,7 @@ Copyright (C) Malcev N. 2013, 2014
 			this.children[model.cid] = view;
 			return view;
 		},
-		cleanChildren: function () {
+		cleanChildren: function(){
 			_.each(this.children, function (child) {
 				child.baseView = null;
 				child.$el.off().remove();
@@ -110,29 +110,30 @@ Copyright (C) Malcev N. 2013, 2014
             this.children = {};
             this.render();
         },
-        render: function () {
-            if(_.isString(this.template)){
+        render: function(tools){
+			if(typeof(this.template) == 'function'){
+				var 	modelJSON = this.model ? this.model.toJSON({computed: true}) : {};
 				
-				if(~this.template.indexOf('<%')){
-					this.template = _.template(this.template);
-				}else{
-					this.$el.empty().html(this.template);
-					return;
-				}
-            }
-			
-			var modelJSON = this.model ? this.model.toJSON({computed: true}) : {};
-			modelJSON._tools = this.tools;
-			this.$el.empty().html(this.template(modelJSON));
+				modelJSON._tools = tools || this.tools;
+				this.el.innerHTML = this.template(modelJSON);
+			}else if(typeof(this.template) == 'string' && this.template.indexOf('<%') == -1){
+				this.el.innerHTML = this.template;	
+			}else if(this.template){
+				this.template = _.template(this.template);
+				return this.render(tools);
+			}
+
+			return this; 
         },
         remove: function() {
-            this.trigger('remove');
-            _.each(this.children, function (view) {
-                view.remove();
-            });
-            this.$el.off().empty();
-            this.stopListening();
-            return this;
+			this.trigger('remove');
+			_.each(this.children, function (view) {
+			    view.remove();
+			});
+			this.$el.off().empty();
+			this.stopListening();
+			this.controls = null;
+			return this;
         }
     });
 	
@@ -192,15 +193,12 @@ Copyright (C) Malcev N. 2013, 2014
 			this._dependendsIndex++;
 			return this;
 		},
-		
-		
 		// @TODO: сделать перегрузку аргументов!
 		// add new transformation of model property in view  [model:property] -> [transformer] -> [view:property] 
 		// @param {String} name - model property name
 		// @param {Function} cb - callback for value modification
 		// @param {String} viewPropertyName - optional destination view property
 		_addTransform: function(name, cb, viewPropertyName){
-			
 			if(!Array.isArray(this._transformers[name])){
 				this._transformers[name] = [];
 			}
@@ -209,34 +207,38 @@ Copyright (C) Malcev N. 2013, 2014
 				cb.call(this, this.controls[viewPropertyName || name], value, value.get(name));
 			}.bind(this));
 		},
-		
-		render: function(){
-			if(_.isString(this.template)){
-                this.el.innerHTML = this.template;
-            }else{
-				var modelJSON = this.model ? this.model.toJSON({computed:true}) : {};
-				modelJSON._tools = this.tools
-                this.el.innerHTML = this.template(modelJSON);
-            }
-			
+		render: function(tools){
+			if(typeof(this.template) == 'function'){
+				var 	modelJSON = this.model ? this.model.toJSON({computed: true}) : {};
+				
+				modelJSON._tools = tools || this.tools;
+				this.el.innerHTML = this.template(modelJSON);
+			}else if(typeof(this.template) == 'string' && this.template.indexOf('<%') == -1){
+				this.el.innerHTML = this.template;	
+			}else if(this.template){
+				this.template = _.template(this.template);
+				return this.render(tools);
+			}
+
+			this.controls = {};
 			this._bindByRole();
+			return this; 
 		},
 		remove: function(){
 			_.each(this.children, function (view) {
                 view.remove();
             });
 			this.$el.off().empty();
+			this.controls = null;
 			Backbone.View.prototype.remove.call(this);
 			return this;
 		},
-		
-		_bindByRole: function(){
+		// @param {HtmlElement} $target
+		_bindByRole: function($target){
 			var 	CATCH_DEFIS = /-(\w)/g,
 					replaceDefis = function(str, p1) {return p1.toUpperCase();},
-					roleNodes = this.el.querySelectorAll('[data-co]');
+					roleNodes = ($target || this.el).querySelectorAll('[data-co]');
 				
-			this.controls = {};	
-			
 			for(var i = 0, len = roleNodes.length, field; i < len; i++){
 				field = roleNodes[i].dataset.co.replace(CATCH_DEFIS, replaceDefis);
 				this.controls[field] = $(roleNodes[i]);
@@ -244,7 +246,8 @@ Copyright (C) Malcev N. 2013, 2014
 		},
 		// @param {Object} modelObj - object with model properties
 		_m3refresh: function(modelObj){
-			var _depExecuteList = [];
+			var 	_depExecuteList = [];
+
 			_.each(modelObj, function(changedValue, changedPropertyName){
 				var _model = this.model;
 				
